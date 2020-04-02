@@ -17,13 +17,12 @@ module.exports = class MentionCount extends Plugin {
         inject('mentioncount', DefaultHomeButton.prototype, 'render', function (_, res) {
             if (!homebtn) homebtn = this
             try {
-                const badge = res.props.children.props.children.props.children[1].props.children.props.lowerBadge
+                const { props } = res.props.children.props.children.props.children.props.children[1].props.children
                 let count = gm()
                 last = count
-                count += badge ? badge.props.count : 0
                 if (count == 0) return res
-                res.props.children.props.children.props.children[1].props.children.props.lowerBadge =
-                    React.createElement(NumberBadge, { count })
+                if (props.lowerBadge) count += props.lowerBadge.props.count
+                props.lowerBadge = React.createElement(NumberBadge, { count })
             } catch (e) {
                 console.error(e)
             }
