@@ -23,7 +23,6 @@ module.exports = class MentionCount extends Plugin {
             if (!homebtn) homebtn = this
             const d = _this.settings.get('display', 0)
 
-            console.log(res)
             try {
                 const { props } = res.props.children.props.children.props.children.props.children[1]
                 const { props: props2 } = props.children
