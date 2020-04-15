@@ -6,7 +6,7 @@ module.exports = class Settings extends React.Component {
         return <>
             <SwitchItem
                 value={ this.props.getSetting('customBadge', true) }
-                toggle={ () => this.props.toggleSetting('customBadge', true) }
+                onChange={ () => this.props.toggleSetting('customBadge', true) }
                 note='Custom badge can show max 99k+ mentions instead of 1k+ by default.'
             >Use custom badge component</SwitchItem>
             <RadioGroup
