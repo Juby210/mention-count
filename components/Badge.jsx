@@ -9,7 +9,7 @@ setImmediate(async () => {
 module.exports = props => props && props.count ?
     props.count < 1000 ? <NumberBadge { ...props } /> :
     <div
-        className={ `${classes.base} ${classes.numberBadge}` }
+        className={ `${classes.base} ${classes.numberBadge}${props.className ? ' ' + props.className : ''}` }
         style={{ backgroundColor: 'rgb(240, 71, 71)', width: getWidth(props) }}
     >{getCount(props.count)}</div> : null
 
