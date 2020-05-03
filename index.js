@@ -6,16 +6,18 @@ const { inject, uninject } = require('powercord/injector')
 const Badge = require('./components/Badge')
 const Settings = require('./components/Settings')
 
+const n = getModule(['NumberBadge'], false)
+
 module.exports = class MentionCount extends Plugin {
     async startPlugin() {
-        this.registerSettings('mention-count', 'Mention Count', Settings)
+        this.registerSettings('mention-count', 'Mention Count',
+            p => React.createElement(Settings, { injectNumberBadge: this.injectNumberBadge, ...p }))
         this.loadCSS(resolve(__dirname, 'style.css'))
 
         const { getTotalMentionCount: gm } = await getModule(['getGuildUnreadCount'])
         const { listItem } = await getModule(['guildSeparator', 'listItem'])
         const dispatcher = await getModule(['dispatch'])
         const { DefaultHomeButton } = await getModule(['DefaultHomeButton'])
-        const { NumberBadge } = await getModule(['NumberBadge'])
 
         let homebtn, last = 0, _this = this
 
@@ -33,7 +35,7 @@ module.exports = class MentionCount extends Plugin {
                     case 0:
                         if (props2.lowerBadge) count += props2.lowerBadge.props.count
                         props2.lowerBadge = React.createElement(
-                            _this.settings.get('customBadge', true) ? Badge : NumberBadge, { count }
+                            _this.settings.get('customBadge', true) ? Badge : n.NumberBadge, { count }
                         )
                         break
                     case 1:
@@ -53,13 +55,24 @@ module.exports = class MentionCount extends Plugin {
             const d = this.settings.get('display', 0)
             if ((!d || d == 2) && homebtn && last != gm()) homebtn.forceUpdate()
         })
+
+        this.injectNumberBadge(this.settings.get('fixBadges'))
     }
 
     async pluginWillUnload() {
         uninject('mention-count')
+        this.injectNumberBadge(false)
         if (this.updateBadge) {
             const dispatcher = await getModule(['dispatch'])
             dispatcher.unsubscribe('MESSAGE_CREATE', this.updateBadge)
         }
+    }
+
+    async injectNumberBadge(bool) {
+        if (!bool) return uninject('mention-count-badge')
+        inject('mention-count-badge', n, 'NumberBadge', (args, res) => {
+            if (args[0] && args[0].count < 1000) return res
+            return React.createElement(Badge, args[0])
+        })
     }
 }
