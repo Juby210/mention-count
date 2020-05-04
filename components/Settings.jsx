@@ -2,15 +2,6 @@ const { React } = require('powercord/webpack')
 const { RadioGroup, SwitchItem } = require('powercord/components/settings')
 
 module.exports = class Settings extends React.PureComponent {
-    constructor(props) {
-        super(props)
-
-        this.toggleFixBadges = () => {
-            props.toggleSetting('fixBadges')
-            props.injectNumberBadge(props.getSetting('fixBadges'))
-        }
-    }
-
     render() {
         return <>
             <SwitchItem
@@ -23,7 +14,7 @@ module.exports = class Settings extends React.PureComponent {
             >Use custom badge component</SwitchItem>
             <SwitchItem
                 value={ this.props.getSetting('fixBadges') }
-                onChange={ this.toggleFixBadges }
+                onChange={ () => this.toggleFixBadges() }
                 disabled={ !this.props.getSetting('customBadge', true) }
             >Replace also other NumberBadges with custom badge</SwitchItem>
             <RadioGroup
@@ -36,5 +27,10 @@ module.exports = class Settings extends React.PureComponent {
                 onChange={ e => this.props.updateSetting('display', e.value) }
             >Display method</RadioGroup>
         </>
+    }
+
+    toggleFixBadges() {
+        this.props.toggleSetting('fixBadges')
+        this.props.injectNumberBadge(this.props.getSetting('fixBadges'))
     }
 }

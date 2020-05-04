@@ -68,7 +68,7 @@ module.exports = class MentionCount extends Plugin {
         }
     }
 
-    async injectNumberBadge(bool) {
+    injectNumberBadge(bool) {
         if (!bool) return uninject('mention-count-badge')
         inject('mention-count-badge', n, 'NumberBadge', (args, res) => {
             if (args[0] && args[0].count < 1000) return res
