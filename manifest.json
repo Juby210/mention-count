@@ -1,7 +1,7 @@
 {
     "name": "Mention Count",
-    "description": "Mention count like in mobile app. Can also fix NumberBadges to show more than 1k.",
+    "description": "Mention count like in old mobile app. Can also fix NumberBadges to show more than 1k.",
     "author": "Juby210#0577",
-    "version": "1.1.1",
+    "version": "1.2.0",
     "license": "MIT"
 }
