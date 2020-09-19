@@ -24,7 +24,6 @@ module.exports = class MentionCount extends Plugin {
 
         inject('mention-count', DefaultHomeButton.prototype, 'render', (_, res) => {
             const d = this.settings.get('display', 0)
-            console.log(res)
 
             let count = gm()
             this.last = count
