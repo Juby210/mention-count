@@ -3,8 +3,8 @@ const { getModule, FluxDispatcher, React } = require('powercord/webpack')
 const { inject, uninject } = require('powercord/injector')
 
 const Badge = require('./components/Badge')
-const HomeBadge = require('./components/HomeBadge')
 const Settings = require('./components/Settings')
+const UpdateableBadge = require('./components/UpdateableBadge')
 
 const n = getModule(['NumberBadge'], false)
 const getNestedProp = (e, t) => t.split('.').reduce((e, p) => e && e[p], e)
@@ -25,25 +25,31 @@ module.exports = class MentionCount extends Plugin {
         inject('mention-count', DefaultHomeButton.prototype, 'render', (_, res) => {
             const d = this.settings.get('display', 0)
 
-            let count = gm()
-            this.last = count
             if (d == 2) {
-                res = [ res, React.createElement('div', { className: listItem + ' mention-count' }, count) ]
+                res = [ res, React.createElement(UpdateableBadge, {
+                    Badge: ({ count }) => React.createElement('div', { className: listItem + ' mention-count' }, count),
+                    count: 0,
+                    _this: this,
+                    gm
+                })]
                 res.props = res[0].props
                 return res
             }
-            if (count == 0) return res
             const r = getNestedProp(res, 'props.children.props.children.props.children.props.children.1.props')
             if (!r) return res
             if (!d) {
                 const { props } = r.children
-                props.lowerBadge = React.createElement(HomeBadge, {
+                props.lowerBadge = React.createElement(UpdateableBadge, {
                     Badge: this.settings.get('customBadge', true) ? Badge : n.NumberBadge,
                     count: props.lowerBadge ? props.lowerBadge.props.count : 0,
                     _this: this,
                     gm
                 })
-            } else r.text = `${count} Mention${count > 1 ? 's' : ''}`
+            } else {
+                let count = gm()
+                this.last = count
+                r.text = `${count} Mention${count > 1 ? 's' : ''}`
+            }
 
             return res
         })

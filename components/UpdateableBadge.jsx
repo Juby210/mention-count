@@ -1,6 +1,6 @@
 const { React } = require('powercord/webpack')
 
-module.exports = class HomeBadge extends React.PureComponent {
+module.exports = class UpdateableBadge extends React.PureComponent {
     constructor(props) {
         super(props)
 
