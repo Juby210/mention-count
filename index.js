@@ -18,7 +18,15 @@ module.exports = class MentionCount extends Plugin {
             render: p => React.createElement(Settings, { injectNumberBadge: this.injectNumberBadge, ...p })
         })
 
-        const { getTotalMentionCount: gm } = await getModule(['getGuildUnreadCount'])
+        // const { getTotalMentionCount: gm } = await getModule(['getGuildUnreadCount'])
+        const { getAllReadStates } = await getModule(['getAllReadStates', 'hasUnread'])
+        const gm = () => {
+            let mentionCount = 0
+            for (const state of getAllReadStates()) {
+                mentionCount += state.mentionCount
+            }
+            return mentionCount
+        }
         const { listItem } = await getModule(['guildSeparator', 'listItem'])
         const { DefaultHomeButton } = await getModule(['DefaultHomeButton'])
 
