@@ -18,30 +18,38 @@ module.exports = class MentionCount extends Plugin {
 
         const UnreadsStore = await getModule(['getTotalMentionCount'])
         const { listItem } = await getModule(['guildSeparator', 'listItem'])
-
-        const HomeButton = await getModule(m =>
-            typeof m.default === 'function' &&
-            (m.__powercordOriginal_default || m.default).toString().indexOf('showDMsOnly') !== -1
-        )
-        inject('mention-count', HomeButton, 'default', (_, res) => {
-            const { type } = res
-            res.type = props => {
+    
+        const PatchedHomeButton = props => {
+            if (!props) return null
+            try {
                 const mentionCount = FluxUtils.useStateFromStores([ UnreadsStore ], UnreadsStore.getTotalMentionCount)
                 const d = this.settings.get('display', 0)
-                if (!d) return type({ ...props, badge: props.badge + mentionCount })
-                const ret = type(props)
+                if (!d) return props.__mc_type({ ...props, badge: props.badge + mentionCount })
+                const ret = props.__mc_type(props)
                 if (d === 2) return [ ret, React.createElement('div', { className: listItem + ' mention-count' }, mentionCount) ] 
                 else {
                     const tooltipProps = findInReactTree(ret, e => e && e.text)
                     if (tooltipProps) tooltipProps.text = `${mentionCount} Mention${mentionCount > 1 ? 's' : ''}`
                 }
                 return ret
+            } catch (e) {
+                this.error(e)
+                return props.__mc_type(props)
             }
+        }
+
+        const HomeButton = await getModule(m =>
+            typeof m.default === 'function' &&
+            (m.__powercordOriginal_default || m.default).toString().indexOf('showDMsOnly') !== -1
+        )
+        inject('mention-count', HomeButton, 'default', (_, res) => {
+            res.props.__mc_type = res.type
+            res.type = PatchedHomeButton
             return res
         })
         HomeButton.default.toString = () => HomeButton.__powercordOriginal_default.toString()
 
-        forceUpdateElement(`.${getModule(['homeIcon', 'downloadProgress']).tutorialContainer}`)
+        forceUpdateElement(`.${getModule(['homeIcon', 'downloadProgress'], false).tutorialContainer}`)
     }
 
     async pluginWillUnload() {
