@@ -9,7 +9,3 @@
     white-space: nowrap;
     color: var(--text-muted);
 }
-
-[id*=lower_badge_masks] {
-    display: none;
-}
