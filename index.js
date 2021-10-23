@@ -1,7 +1,9 @@
 const { Plugin } = require('powercord/entities')
 const { forceUpdateElement, findInReactTree } = require('powercord/util')
-const { getModule, Flux, FluxDispatcher, React } = require('powercord/webpack')
+const { getModule, React } = require('powercord/webpack')
 const { inject, uninject } = require('powercord/injector')
+
+const FluxUtils = getModule(['useStateFromStores'], false)
 
 const Settings = require('./components/Settings')
 
@@ -23,17 +25,18 @@ module.exports = class MentionCount extends Plugin {
         )
         inject('mention-count', HomeButton, 'default', (_, res) => {
             const { type } = res
-            res.type = Flux.connectStores([ UnreadsStore ], () => ({ mentionCount: UnreadsStore.getTotalMentionCount() }))(props => {
+            res.type = props => {
+                const mentionCount = FluxUtils.useStateFromStores([ UnreadsStore ], UnreadsStore.getTotalMentionCount)
                 const d = this.settings.get('display', 0)
-                if (!d) return type({ ...props, badge: props.badge + props.mentionCount })
+                if (!d) return type({ ...props, badge: props.badge + mentionCount })
                 const ret = type(props)
-                if (d === 2) return [ ret, React.createElement('div', { className: listItem + ' mention-count' }, props.mentionCount) ] 
+                if (d === 2) return [ ret, React.createElement('div', { className: listItem + ' mention-count' }, mentionCount) ] 
                 else {
                     const tooltipProps = findInReactTree(ret, e => e && e.text)
-                    if (tooltipProps) tooltipProps.text = `${props.mentionCount} Mention${props.mentionCount > 1 ? 's' : ''}`
+                    if (tooltipProps) tooltipProps.text = `${mentionCount} Mention${mentionCount > 1 ? 's' : ''}`
                 }
                 return ret
-            })
+            }
             return res
         })
         HomeButton.default.toString = () => HomeButton.__powercordOriginal_default.toString()
