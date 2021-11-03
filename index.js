@@ -38,16 +38,12 @@ module.exports = class MentionCount extends Plugin {
             }
         }
 
-        const HomeButton = await getModule(m =>
-            typeof m.default === 'function' &&
-            (m.__powercordOriginal_default || m.default).toString().indexOf('showDMsOnly') !== -1
-        )
-        inject('mention-count', HomeButton, 'default', (_, res) => {
+        const HomeButton = await getModule(['HomeButton'])
+        inject('mention-count', HomeButton, 'HomeButton', (_, res) => {
             res.props.__mc_type = res.type
             res.type = PatchedHomeButton
             return res
         })
-        HomeButton.default.toString = () => HomeButton.__powercordOriginal_default.toString()
 
         forceUpdateElement(`.${getModule(['homeIcon', 'downloadProgress'], false).tutorialContainer}`)
     }
